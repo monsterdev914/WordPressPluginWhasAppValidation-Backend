@@ -5,12 +5,15 @@ import json
 import httpx
 import os
 import time
+import uvicorn
 app = FastAPI()
 scheduler = AsyncIOScheduler()
+
 
 class Account(BaseModel):
     API_KEY: str
     NUMBER_ID: str
+
 
 def sync_device(account):
     try:
@@ -18,6 +21,7 @@ def sync_device(account):
         print(f"Synced device {account['NUMBER_ID']}: {response.text}")
     except Exception as e:
         print(f"Error syncing device {account['NUMBER_ID']}: {e}")
+
 
 def timed_task():
     # if file is not found, create it
@@ -29,14 +33,17 @@ def timed_task():
     for account in accounts:
         sync_device(account)
 
+
 @app.on_event("startup")
 async def startup_event():
     scheduler.add_job(timed_task, "interval", minutes=2)
     scheduler.start()
 
+
 @app.on_event("shutdown")
 async def shutdown_event():
     scheduler.shutdown()
+
     
 @app.get("remove_account/{number_id}", status_code=status.HTTP_200_OK)
 def remove_account(number_id: str):
@@ -52,6 +59,7 @@ def remove_account(number_id: str):
         return {"message": "Account removed successfully"}
     except Exception as e:
         return {"message": f"Error removing account: {e}"}, status.HTTP_500_INTERNAL_SERVER_ERROR
+
 
 @app.post("/add_account", status_code=status.HTTP_201_CREATED)
 def add_account(new_account: Account):
@@ -79,6 +87,11 @@ def add_account(new_account: Account):
     except Exception as e:
         return {"message": f"Error adding account: {e}"}, status.HTTP_500_INTERNAL_SERVER_ERROR
 
+
 @app.get("/")
 def read_root():
     return {"message": "Hello World"}
+
+
+if __name__ == '__main__':
+    uvicorn.run(app, host="0.0.0.0", port=8000)
