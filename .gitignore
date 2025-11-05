@@ -1,0 +1,6 @@
+venv/
+.env
+.DS_Store
+.vscode/
+wassenger_accounts.json
+__pycache__/
