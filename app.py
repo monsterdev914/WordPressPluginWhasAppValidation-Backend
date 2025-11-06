@@ -45,7 +45,7 @@ async def shutdown_event():
     scheduler.shutdown()
 
     
-@app.get("remove_account/{number_id}", status_code=status.HTTP_200_OK)
+@app.get("/remove_account/{number_id}", status_code=status.HTTP_200_OK)
 def remove_account(number_id: str):
     try:
         with open("wassenger_accounts.json", "r") as f:
