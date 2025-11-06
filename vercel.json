@@ -15,6 +15,12 @@
             "dest": "app.py"
         }
     ],
+    "crons": [
+        {
+            "path": "/sync-devices",
+            "schedule": "*/2 * * * *"
+        }
+    ],
     "env": {
         "PYTHON_VERSION": "3.12"
     }
